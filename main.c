@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+void restoreDatabase();
 void saveTransaction(char message[]);
 void viewTransactions();
 void transferMoney();
@@ -897,6 +898,31 @@ void backupDatabase()
 
     printf("Database Backup Created Successfully!\n");
 }
+
+void restoreDatabase()
+{
+    FILE *src = fopen("backup.dat", "rb");
+
+    if(src == NULL)
+    {
+        printf("No Backup Found!\n");
+        return;
+    }
+
+    FILE *dest = fopen("accounts.dat", "wb");
+
+    Account a;
+
+    while(fread(&a, sizeof(Account), 1, src))
+    {
+        fwrite(&a, sizeof(Account), 1, dest);
+    }
+
+    fclose(src);
+    fclose(dest);
+
+    printf("Database Restored Successfully!\n");
+}
 int main()
 {
     createDefaultPassword();
@@ -925,8 +951,9 @@ int main()
         printf("15. Change Admin Password\n");
         printf("16. Export to CSV\n");
         printf("17. Backup Database\n");
-        printf("18. View Transaction History\n");
-        printf("19. Exit\n");
+        printf("18. Restore Database\n");
+        printf("19. View Transaction History\n");
+        printf("20. Exit\n");
 
         printf("Enter Choice: ");
         scanf("%d", &choice);
@@ -1001,9 +1028,15 @@ int main()
         }
         else if(choice == 18)
         {
-            viewTransactions();
+            restoreDatabase();
         }
         else if(choice == 19)
+        {
+            printf("\n=================================\n");
+    printf("Thank You For Using Bank Management System\n");
+    printf("=================================\n");
+        }
+        else if(choice == 20)
         {
             break;
         }
