@@ -1,5 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+void saveTransaction(char message[]);
+void viewTransactions();
+void transferMoney();
+void dashboard();
+void changeAdminPassword();
+void createDefaultPassword();
+void login();
+
+int isDuplicateAccount(int accNo);
 
 typedef struct
 {
@@ -8,6 +19,30 @@ typedef struct
     int pin;
     float balance;
 } Account;
+
+int isDuplicateAccount(int accNo)
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        return 0;
+    }
+
+    Account a;
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(a.accountNumber == accNo)
+        {
+            fclose(fp);
+            return 1;
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
 
 void createAccount()
 {
@@ -23,6 +58,13 @@ void createAccount()
 
     printf("Account Number: ");
     scanf("%d", &a.accountNumber);
+
+    if(isDuplicateAccount(a.accountNumber))
+    {
+        printf("Account Number Already Exists!\n");
+        fclose(fp);
+        return;
+    }
 
     printf("Account Holder Name: ");
     scanf(" %[^\n]", a.name);
@@ -136,6 +178,14 @@ void depositMoney()
 
             fwrite(&a, sizeof(Account), 1, fp);
 
+            char log[200];
+
+sprintf(log,
+        "Deposit | Account: %d | Amount: %.2f",
+        a.accountNumber,
+        amount);
+
+saveTransaction(log);
             printf("\nDeposit Successful!\n");
             printf("New Balance: %.2f\n", a.balance);
 
@@ -191,6 +241,14 @@ void withdrawMoney()
 
             fwrite(&a, sizeof(Account), 1, fp);
 
+            char log[200];
+
+sprintf(log,
+        "Withdraw | Account: %d | Amount: %.2f",
+        a.accountNumber,
+        amount);
+
+saveTransaction(log);
             printf("\nWithdrawal Successful!\n");
             printf("Remaining Balance: %.2f\n", a.balance);
 
@@ -355,8 +413,496 @@ void changePIN()
 
     fclose(fp);
 }
+
+void searchByName()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account a;
+    char searchName[100];
+    int found = 0;
+
+    printf("Enter Account Holder Name: ");
+    scanf(" %[^\n]", searchName);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(strcmp(a.name, searchName) == 0)
+        {
+            printf("\nAccount Found!\n");
+            printf("Account Number : %d\n", a.accountNumber);
+            printf("Name           : %s\n", a.name);
+            printf("Balance        : %.2f\n", a.balance);
+            printf("----------------------------\n");
+
+            found = 1;
+        }
+    }
+
+    if(found == 0)
+    {
+        printf("No Account Found!\n");
+    }
+
+    fclose(fp);
+}
+
+void bankStatistics()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account a;
+
+    int totalAccounts = 0;
+    float totalBalance = 0;
+
+    float highestBalance = -1;
+    char richestCustomer[100];
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        totalAccounts++;
+        totalBalance += a.balance;
+
+        if(a.balance > highestBalance)
+        {
+            highestBalance = a.balance;
+            strcpy(richestCustomer, a.name);
+        }
+    }
+
+    fclose(fp);
+
+    printf("\n====================================\n");
+    printf("        BANK STATISTICS\n");
+    printf("====================================\n");
+
+    printf("Total Accounts   : %d\n", totalAccounts);
+    printf("Total Balance    : %.2f\n", totalBalance);
+
+    if(totalAccounts > 0)
+    {
+        printf("Average Balance  : %.2f\n",
+               totalBalance / totalAccounts);
+
+        printf("Richest Customer : %s\n",
+               richestCustomer);
+
+        printf("Highest Balance  : %.2f\n",
+               highestBalance);
+    }
+
+    printf("====================================\n");
+}
+
+void top5Customers()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account accounts[1000];
+    int n = 0;
+
+    while(fread(&accounts[n], sizeof(Account), 1, fp))
+    {
+        n++;
+    }
+
+    fclose(fp);
+
+    if(n == 0)
+    {
+        printf("No Account Records!\n");
+        return;
+    }
+
+    for(int i = 0; i < n - 1; i++)
+    {
+        for(int j = i + 1; j < n; j++)
+        {
+            if(accounts[i].balance < accounts[j].balance)
+            {
+                Account temp = accounts[i];
+                accounts[i] = accounts[j];
+                accounts[j] = temp;
+            }
+        }
+    }
+
+    printf("\n====================================\n");
+    printf("      TOP 5 RICHEST CUSTOMERS\n");
+    printf("====================================\n");
+
+    int limit = (n < 5) ? n : 5;
+
+    for(int i = 0; i < limit; i++)
+    {
+        printf("%d. %s | Balance: %.2f\n",
+               i + 1,
+               accounts[i].name,
+               accounts[i].balance);
+    }
+
+    printf("====================================\n");
+}
+
+void accountReport()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account a;
+    int accNo;
+    int found = 0;
+
+    printf("Enter Account Number: ");
+    scanf("%d", &accNo);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(a.accountNumber == accNo)
+        {
+            found = 1;
+
+            printf("\n====================================\n");
+            printf("         ACCOUNT REPORT\n");
+            printf("====================================\n");
+
+            printf("Account Number : %d\n", a.accountNumber);
+            printf("Name           : %s\n", a.name);
+            printf("Balance        : %.2f\n", a.balance);
+
+            if(a.balance > 0)
+                printf("Status         : ACTIVE\n");
+            else
+                printf("Status         : INACTIVE\n");
+
+            printf("====================================\n");
+
+            break;
+        }
+    }
+
+    if(found == 0)
+    {
+        printf("Account Not Found!\n");
+    }
+
+    fclose(fp);
+}
+
+void createDefaultPassword()
+{
+    FILE *fp = fopen("admin.dat", "rb");
+
+    if(fp == NULL)
+    {
+        char password[50] = "admin123";
+
+        fp = fopen("admin.dat", "wb");
+        fwrite(password, sizeof(password), 1, fp);
+        fclose(fp);
+    }
+    else
+    {
+        fclose(fp);
+    }
+}
+void login()
+{
+    char savedPass[50];
+    char inputPass[50];
+
+    FILE *fp = fopen("admin.dat", "rb");
+
+    fread(savedPass, sizeof(savedPass), 1, fp);
+    fclose(fp);
+
+    printf("\n========== LOGIN ==========\n");
+    printf("Enter Admin Password: ");
+    scanf("%s", inputPass);
+
+    if(strcmp(savedPass, inputPass) != 0)
+    {
+        printf("Wrong Password!\n");
+        exit(0);
+    }
+
+    printf("\nLogin Successful!\n");
+}
+
+void changeAdminPassword()
+{
+    char oldPass[50];
+    char savedPass[50];
+    char newPass[50];
+
+    FILE *fp = fopen("admin.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("Password File Error!\n");
+        return;
+    }
+
+    fread(savedPass, sizeof(savedPass), 1, fp);
+    fclose(fp);
+
+    printf("Enter Current Password: ");
+    scanf("%s", oldPass);
+
+    if(strcmp(oldPass, savedPass) != 0)
+    {
+        printf("Incorrect Password!\n");
+        return;
+    }
+
+    printf("Enter New Password: ");
+    scanf("%s", newPass);
+
+    fp = fopen("admin.dat", "wb");
+
+    fwrite(newPass, sizeof(newPass), 1, fp);
+
+    fclose(fp);
+
+    printf("\nPassword Changed Successfully!\n");
+}
+
+void dashboard()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    int totalAccounts = 0;
+    float totalBalance = 0;
+
+    if(fp != NULL)
+    {
+        Account a;
+
+        while(fread(&a, sizeof(Account), 1, fp))
+        {
+            totalAccounts++;
+            totalBalance += a.balance;
+        }
+
+        fclose(fp);
+    }
+
+    printf("\n====================================\n");
+    printf("      BANK MANAGEMENT SYSTEM\n");
+    printf("====================================\n");
+    printf("Total Accounts : %d\n", totalAccounts);
+    printf("Total Balance  : %.2f\n", totalBalance);
+    printf("====================================\n");
+}
+
+void saveTransaction(char message[])
+{
+    FILE *fp = fopen("transactions.txt", "a");
+
+    if(fp == NULL)
+        return;
+
+    fprintf(fp, "%s\n", message);
+
+    fclose(fp);
+}
+void transferMoney()
+{
+    FILE *fp = fopen("accounts.dat", "rb+");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    int senderAcc, receiverAcc;
+    float amount;
+
+    printf("Enter Sender Account Number: ");
+    scanf("%d", &senderAcc);
+
+    printf("Enter Receiver Account Number: ");
+    scanf("%d", &receiverAcc);
+
+    printf("Enter Amount: ");
+    scanf("%f", &amount);
+
+    Account accounts[1000];
+    int n = 0;
+
+    while(fread(&accounts[n], sizeof(Account), 1, fp))
+    {
+        n++;
+    }
+
+    int senderIndex = -1;
+    int receiverIndex = -1;
+
+    for(int i = 0; i < n; i++)
+    {
+        if(accounts[i].accountNumber == senderAcc)
+            senderIndex = i;
+
+        if(accounts[i].accountNumber == receiverAcc)
+            receiverIndex = i;
+    }
+
+    if(senderIndex == -1)
+    {
+        printf("Sender Account Not Found!\n");
+        fclose(fp);
+        return;
+    }
+
+    if(receiverIndex == -1)
+    {
+        printf("Receiver Account Not Found!\n");
+        fclose(fp);
+        return;
+    }
+
+    if(accounts[senderIndex].balance < amount)
+    {
+        printf("Insufficient Balance!\n");
+        fclose(fp);
+        return;
+    }
+
+    accounts[senderIndex].balance -= amount;
+    accounts[receiverIndex].balance += amount;
+
+    rewind(fp);
+
+    for(int i = 0; i < n; i++)
+    {
+        fwrite(&accounts[i], sizeof(Account), 1, fp);
+    }
+
+    fclose(fp);
+
+    char log[200];
+
+sprintf(log,
+        "Transfer | From: %d | To: %d | Amount: %.2f",
+        senderAcc,
+        receiverAcc,
+        amount);
+
+saveTransaction(log);
+    printf("\nTransfer Successful!\n");
+    printf("%.2f transferred successfully.\n", amount);
+}
+
+void exportCSV()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    FILE *csv = fopen("accounts.csv", "w");
+
+    Account a;
+
+    fprintf(csv, "AccountNumber,Name,Balance\n");
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        fprintf(csv,
+                "%d,%s,%.2f\n",
+                a.accountNumber,
+                a.name,
+                a.balance);
+    }
+
+    fclose(fp);
+    fclose(csv);
+
+    printf("accounts.csv created successfully!\n");
+}
+
+void viewTransactions()
+{
+    FILE *fp = fopen("transactions.txt", "r");
+
+    if(fp == NULL)
+    {
+        printf("No Transaction History Found!\n");
+        return;
+    }
+
+    char line[300];
+
+    printf("\n========== TRANSACTION HISTORY ==========\n");
+
+    while(fgets(line, sizeof(line), fp))
+    {
+        printf("%s", line);
+    }
+
+    printf("=========================================\n");
+
+    fclose(fp);
+}
+
+void backupDatabase()
+{
+    FILE *src = fopen("accounts.dat", "rb");
+
+    if(src == NULL)
+    {
+        printf("No Database Found!\n");
+        return;
+    }
+
+    FILE *dest = fopen("backup.dat", "wb");
+
+    Account a;
+
+    while(fread(&a, sizeof(Account), 1, src))
+    {
+        fwrite(&a, sizeof(Account), 1, dest);
+    }
+
+    fclose(src);
+    fclose(dest);
+
+    printf("Database Backup Created Successfully!\n");
+}
 int main()
 {
+    createDefaultPassword();
+    login();
+    dashboard();
+
     int choice;
 
     while(1)
@@ -370,7 +916,17 @@ int main()
         printf("6. Check Balance\n");
         printf("7. Delete Account\n");
         printf("8. Change PIN\n");
-        printf("9. Exit\n");
+        printf("9. Search by Name\n");
+        printf("10. Bank Statistics\n");
+        printf("11. Top 5 Richest Customers\n");
+        printf("12. Account Report\n");
+        printf("13. Transfer Money\n");
+        printf("14. View Transaction History\n");
+        printf("15. Change Admin Password\n");
+        printf("16. Export to CSV\n");
+        printf("17. Backup Database\n");
+        printf("18. View Transaction History\n");
+        printf("19. Exit\n");
 
         printf("Enter Choice: ");
         scanf("%d", &choice);
@@ -408,6 +964,46 @@ int main()
             changePIN();
         }
         else if(choice == 9)
+        {
+            searchByName();
+        }
+        else if(choice == 10)
+        {
+            bankStatistics();
+        }
+        else if(choice == 11)
+        {
+            top5Customers();
+        }
+        else if(choice == 12)
+        {
+            accountReport();
+        }
+        else if(choice == 13)
+        {
+            transferMoney();
+        }
+        else if(choice == 14)
+        {
+            changeAdminPassword();
+        }
+        else if(choice == 15)
+        {
+            exportCSV();
+        }
+        else if(choice == 16)
+        {
+            viewTransactions();
+        }
+        else if(choice == 17)
+        {
+            backupDatabase();
+        }
+        else if(choice == 18)
+        {
+            viewTransactions();
+        }
+        else if(choice == 19)
         {
             break;
         }
