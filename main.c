@@ -10,6 +10,7 @@ void dashboard();
 void changeAdminPassword();
 void createDefaultPassword();
 void login();
+void customerLogin();
 
 int isDuplicateAccount(int accNo);
 
@@ -19,6 +20,7 @@ typedef struct
     char name[100];
     int pin;
     float balance;
+    char accountType[20];
 } Account;
 
 int isDuplicateAccount(int accNo)
@@ -67,6 +69,9 @@ void createAccount()
         return;
     }
 
+    printf("Account Type (Savings/Current): ");
+scanf("%s", a.accountType);
+
     printf("Account Holder Name: ");
     scanf(" %[^\n]", a.name);
 
@@ -75,6 +80,8 @@ void createAccount()
 
     printf("Initial Balance: ");
     scanf("%f", &a.balance);
+
+    printf("Account Type : %s\n", a.accountType);
 
     fwrite(&a, sizeof(Account), 1, fp);
 
@@ -100,7 +107,8 @@ void viewAccounts()
     while(fread(&a, sizeof(Account), 1, fp))
     {
         printf("\nAccount Number : %d\n", a.accountNumber);
-        printf("Name           : %s\n", a.name);      
+        printf("Name           : %s\n", a.name);  
+        printf("Account Type   : %s\n", a.accountType);    
         printf("Balance        : %.2f\n", a.balance);
         printf("-------------------------------\n");
     }
@@ -132,6 +140,7 @@ void searchAccount()
             printf("\nAccount Found!\n");
             printf("Account Number : %d\n", a.accountNumber);
             printf("Name           : %s\n", a.name);
+            printf("Account Type   : %s\n", a.accountType);
             printf("Balance        : %.2f\n", a.balance);
 
             found = 1;
@@ -168,6 +177,13 @@ void depositMoney()
     printf("Enter Deposit Amount: ");
     scanf("%f", &amount);
 
+        if(amount <= 0)
+{
+    printf("Invalid Amount!\n");
+    fclose(fp);
+    return;
+}
+
     while(fread(&a, sizeof(Account), 1, fp))
     {
         if(a.accountNumber == accNo)
@@ -193,6 +209,8 @@ saveTransaction(log);
             break;
         }
     }
+
+
 
     if(found == 0)
     {
@@ -222,6 +240,14 @@ void withdrawMoney()
 
     printf("Enter Withdraw Amount: ");
     scanf("%f", &amount);
+
+        if(amount <= 0)
+{
+    printf("Invalid Amount!\n");
+    fclose(fp);
+    return;
+}
+
 
     while(fread(&a, sizeof(Account), 1, fp))
     {
@@ -255,6 +281,7 @@ saveTransaction(log);
             break;
         }
     }
+
 
     if(found == 0)
     {
@@ -592,6 +619,7 @@ void accountReport()
 
             printf("Account Number : %d\n", a.accountNumber);
             printf("Name           : %s\n", a.name);
+            printf("Account Type   : %s\n", a.accountType);
             printf("Balance        : %.2f\n", a.balance);
 
             if(a.balance > 0)
@@ -772,6 +800,13 @@ void transferMoney()
             receiverIndex = i;
     }
 
+    if(amount <= 0)
+{
+    printf("Invalid Amount!\n");
+    fclose(fp);
+    return;
+}
+
     if(senderIndex == -1)
     {
         printf("Sender Account Not Found!\n");
@@ -922,11 +957,102 @@ void restoreDatabase()
 
     printf("Database Restored Successfully!\n");
 }
+
+void customerLogin()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    int accNo, pin;
+    Account a;
+    int found = 0;
+
+    printf("\n===== CUSTOMER LOGIN =====\n");
+
+    printf("Account Number: ");
+    scanf("%d", &accNo);
+
+    printf("PIN: ");
+    scanf("%d", &pin);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(a.accountNumber == accNo && a.pin == pin)
+        {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if(!found)
+    {
+        printf("Invalid Account Number or PIN!\n");
+        return;
+    }
+
+    printf("\nWelcome %s\n", a.name);
+
+    int choice;
+
+    while(1)
+    {
+        printf("\n===== CUSTOMER PANEL =====\n");
+        printf("1. Check Balance\n");
+        printf("2. Logout\n");
+
+        printf("Enter Choice: ");
+        scanf("%d", &choice);
+
+        if(choice == 1)
+        {
+            printf("Current Balance: %.2f\n", a.balance);
+        }
+        else if(choice == 2)
+        {
+            break;
+        }
+        else
+        {
+            printf("Invalid Choice!\n");
+        }
+    }
+}
+
 int main()
 {
     createDefaultPassword();
+
+int role;
+
+printf("\n===== BANK MANAGEMENT SYSTEM =====\n");
+printf("1. Admin Login\n");
+printf("2. Customer Login\n");
+printf("3. Exit\n");
+
+printf("Enter Choice: ");
+scanf("%d", &role);
+
+if(role == 1)
+{
     login();
     dashboard();
+}
+else if(role == 2)
+{
+    customerLogin();
+    return 0;
+}
+else
+{
+    return 0;
+}
 
     int choice;
 
@@ -1034,10 +1160,14 @@ int main()
             printf("\n=================================\n");
     printf("Thank You For Using Bank Management System\n");
     printf("=================================\n");
+
+    break;
         }
         else
         {
             printf("Invalid Choice!\n");
+
+            break;
         }
     }
 
