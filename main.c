@@ -100,8 +100,7 @@ void viewAccounts()
     while(fread(&a, sizeof(Account), 1, fp))
     {
         printf("\nAccount Number : %d\n", a.accountNumber);
-        printf("Name           : %s\n", a.name);
-        printf("PIN            : %d\n", a.pin);
+        printf("Name           : %s\n", a.name);      
         printf("Balance        : %.2f\n", a.balance);
         printf("-------------------------------\n");
     }
