@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ui.h"
 
 void restoreDatabase();
 void saveTransaction(char message[]);
@@ -87,7 +88,10 @@ scanf("%s", a.accountType);
 
     fclose(fp);
 
-    printf("\nAccount Created Successfully!\n");
+setColor(10);
+printf("\n[SUCCESS] Account Created Successfully!\n");
+setColor(7);
+
 }
 
 void viewAccounts()
@@ -137,11 +141,14 @@ void searchAccount()
     {
         if(a.accountNumber == searchAccountNumber)
         {
-            printf("\nAccount Found!\n");
-            printf("Account Number : %d\n", a.accountNumber);
-            printf("Name           : %s\n", a.name);
-            printf("Account Type   : %s\n", a.accountType);
-            printf("Balance        : %.2f\n", a.balance);
+            accountCard();
+
+printf("Account Number : %d\n", a.accountNumber);
+printf("Name           : %s\n", a.name);
+printf("Account Type   : %s\n", a.accountType);
+printf("Balance        : %.2f\n", a.balance);
+
+line();
 
             found = 1;
             break;
@@ -202,7 +209,9 @@ sprintf(log,
         amount);
 
 saveTransaction(log);
-            printf("\nDeposit Successful!\n");
+            setColor(10);
+printf("\nDeposit Successful!\n");
+setColor(7);
             printf("New Balance: %.2f\n", a.balance);
 
             found = 1;
@@ -214,7 +223,9 @@ saveTransaction(log);
 
     if(found == 0)
     {
-        printf("Account Not Found!\n");
+        setColor(12);
+printf("Account Not Found!\n");
+setColor(7);
     }
 
     fclose(fp);
@@ -275,7 +286,9 @@ sprintf(log,
         amount);
 
 saveTransaction(log);
-            printf("\nWithdrawal Successful!\n");
+            setColor(10);
+printf("\nWithdrawal Successful!\n");
+setColor(7);
             printf("Remaining Balance: %.2f\n", a.balance);
 
             break;
@@ -285,7 +298,9 @@ saveTransaction(log);
 
     if(found == 0)
     {
-        printf("Account Not Found!\n");
+        setColor(12);
+printf("Account Not Found!\n");
+setColor(7);
     }
 
     fclose(fp);
@@ -617,11 +632,19 @@ void accountReport()
             printf("         ACCOUNT REPORT\n");
             printf("====================================\n");
 
-            printf("Account Number : %d\n", a.accountNumber);
-            printf("Name           : %s\n", a.name);
-            printf("Account Type   : %s\n", a.accountType);
-            printf("Balance        : %.2f\n", a.balance);
+            accountCard();
 
+printf("Account Number : %d\n", a.accountNumber);
+printf("Name           : %s\n", a.name);
+printf("Account Type   : %s\n", a.accountType);
+printf("Balance        : %.2f\n", a.balance);
+
+if(a.balance > 0)
+    printf("Status         : ACTIVE\n");
+else
+    printf("Status         : INACTIVE\n");
+
+line();
             if(a.balance > 0)
                 printf("Status         : ACTIVE\n");
             else
@@ -739,9 +762,23 @@ void dashboard()
         fclose(fp);
     }
 
-    printf("\n====================================\n");
-    printf("      BANK MANAGEMENT SYSTEM\n");
-    printf("====================================\n");
+   setColor(11);
+
+printf("\n");
+line();
+printf("            BANK DASHBOARD\n");
+line();
+
+setColor(10);
+
+printf("Total Accounts : %d\n", totalAccounts);
+printf("Total Balance  : %.2f\n", totalBalance);
+
+setColor(11);
+
+line();
+
+setColor(7);
     printf("Total Accounts : %d\n", totalAccounts);
     printf("Total Balance  : %.2f\n", totalBalance);
     printf("====================================\n");
@@ -1058,6 +1095,8 @@ else
 
     while(1)
     {
+        title();
+
         printf("\n===== BANK MANAGEMENT SYSTEM =====\n");
         printf("1. Create Account\n");
         printf("2. View Accounts\n");

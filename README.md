@@ -1,44 +1,26 @@
-# Bank Management System in C
+# 🏦 Bank Management System (BMS)
 
-A console-based Bank Management System built using C and File Handling.
+A professional console-based Bank Management System developed in C. This project provides secure account management, customer and admin authentication, money transfers, transaction tracking, bank statistics, database backup & restore, and CSV export functionality.
 
 ## Features
-
-- Admin Login
-- Change Admin Password
-- Create Account
-- Duplicate Account Check
-- Search by Account Number
-- Search by Name
-- Deposit Money
-- Withdraw Money
-- Transfer Money
-- Check Balance
-- Delete Account
-- Change PIN
-- Bank Statistics
-- Top 5 Richest Customers
-- Account Report
-- Export Accounts to CSV
-- Transaction History
-- Backup Database
-- Restore Database
+- 🔐 Admin Login System
+- 👤 Customer Login System
+- ➕ Create Account
+- 💰 Deposit Money
+- 💸 Withdraw Money
+- 🔄 Transfer Money
+- 📊 Bank Statistics
+- 📜 Transaction History
+- 📁 CSV Export
+- 💾 Database Backup & Restore
+- 🏦 Account Type Support (Savings/Current)
+- 🎨 Professional Console UI
 
 ## Technologies Used
-
 - C Programming
-- Structures
 - File Handling
-- Searching
-- Sorting
-
-## How to Run
-
-```bash
-gcc main.c -o bank.exe
-.\bank.exe
-```
+- Structures
+- Windows Console API
 
 ## Author
-
-Sabbir
+Sabbir's Productions
