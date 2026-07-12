@@ -952,8 +952,7 @@ int main()
         printf("16. Export to CSV\n");
         printf("17. Backup Database\n");
         printf("18. Restore Database\n");
-        printf("19. View Transaction History\n");
-        printf("20. Exit\n");
+        printf("19. Exit\n");
 
         printf("Enter Choice: ");
         scanf("%d", &choice);
@@ -1012,15 +1011,15 @@ int main()
         }
         else if(choice == 14)
         {
-            changeAdminPassword();
+            viewTransactions();
         }
         else if(choice == 15)
         {
-            exportCSV();
+            changeAdminPassword();
         }
         else if(choice == 16)
         {
-            viewTransactions();
+            exportCSV();
         }
         else if(choice == 17)
         {
@@ -1030,15 +1029,12 @@ int main()
         {
             restoreDatabase();
         }
+       
         else if(choice == 19)
         {
             printf("\n=================================\n");
     printf("Thank You For Using Bank Management System\n");
     printf("=================================\n");
-        }
-        else if(choice == 20)
-        {
-            break;
         }
         else
         {
