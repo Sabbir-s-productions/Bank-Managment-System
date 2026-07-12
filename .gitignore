@@ -1,0 +1,6 @@
+*.exe
+*.dat
+accounts.csv
+transactions.txt
+backup.dat
+temp.dat
