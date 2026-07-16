@@ -778,10 +778,7 @@ setColor(11);
 
 line();
 
-setColor(7);
-    printf("Total Accounts : %d\n", totalAccounts);
-    printf("Total Balance  : %.2f\n", totalBalance);
-    printf("====================================\n");
+
 }
 
 void saveTransaction(char message[])
@@ -1097,7 +1094,7 @@ else
     {
         title();
 
-        printf("\n===== BANK MANAGEMENT SYSTEM =====\n");
+  
         printf("1. Create Account\n");
         printf("2. View Accounts\n");
         printf("3. Search Account\n");
