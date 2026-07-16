@@ -645,14 +645,7 @@ else
     printf("Status         : INACTIVE\n");
 
 line();
-            if(a.balance > 0)
-                printf("Status         : ACTIVE\n");
-            else
-                printf("Status         : INACTIVE\n");
-
-            printf("====================================\n");
-
-            break;
+            
         }
     }
 
