@@ -1,6 +1,17 @@
+# Executables
+*.exe
 
+# Database Files
 *.dat
-accounts.csv
-transactions.txt
-backup.dat
-temp.dat
+
+# Transaction Logs
+*.txt
+
+# CSV Exports
+*.csv
+
+# VS Code
+.vscode/
+
+# Build Folder
+build/
