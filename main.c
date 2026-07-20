@@ -7,6 +7,7 @@
 #include "admin.h"
 #include "loan.h"
 #include "fd.h"
+#include "card.h"
 
 void restoreDatabase();
 void saveTransaction(char message[]);
@@ -283,7 +284,11 @@ else
         printf("26. View All Fixed Deposits\n");
         printf("27. Search Transactions by Account\n");
         printf("28. Edit Account Information\n");
-        printf("29. Exit\n");
+        printf("29. Create ATM Card\n");
+        printf("30. View ATM Cards\n");
+        printf("31. Block ATM Card\n");
+        printf("32. Unblock ATM Card\n");
+        printf("33. Exit\n");
 
         printf("Enter Choice: ");
         scanf("%d", &choice);
@@ -402,6 +407,22 @@ else
         }
 else if(choice == 29)
 {
+    createATMCard();
+}
+else if(choice == 30)
+{
+    viewATMCards();
+}
+else if(choice == 31)
+{
+    blockATMCard();
+}
+else if(choice == 32)
+{
+    unblockATMCard();
+}
+else if(choice == 33)
+{
     printf("\n=================================\n");
     printf("Thank You For Using Bank Management System\n");
     printf("=================================\n");
@@ -410,8 +431,6 @@ else if(choice == 29)
         else
         {
             printf("Invalid Choice!\n");
-
-            break;
         }
     }
 
