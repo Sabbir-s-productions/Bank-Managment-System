@@ -6,6 +6,7 @@
 #include "transaction.h"
 #include "admin.h"
 #include "loan.h"
+#include "fd.h"
 
 void restoreDatabase();
 void saveTransaction(char message[]);
@@ -16,6 +17,8 @@ void changeAdminPassword();
 void createDefaultPassword();
 void login();
 void customerLogin();
+void unlockAccount();
+void searchTransactionByAccount();
 
 int isDuplicateAccount(int accNo);
 
@@ -27,7 +30,7 @@ int isDuplicateAccount(int accNo);
 
 void customerLogin()
 {
-    FILE *fp = fopen("accounts.dat", "rb");
+   FILE *fp = fopen("accounts.dat", "rb+");
 
     if(fp == NULL)
     {
@@ -47,15 +50,42 @@ void customerLogin()
     printf("PIN: ");
     scanf("%d", &pin);
 
-    while(fread(&a, sizeof(Account), 1, fp))
+  while(fread(&a, sizeof(Account), 1, fp))
+{
+    if(a.accountNumber == accNo)
     {
-        if(a.accountNumber == accNo && a.pin == pin)
+        if(a.isLocked == 1)
+        {
+            printf("Account Locked!\n");
+            fclose(fp);
+            return;
+        }
+
+        if(a.pin == pin)
         {
             found = 1;
             break;
         }
-    }
 
+        printf("Invalid PIN!\n");
+        a.failedAttempts++;
+
+if(a.failedAttempts >= 3)
+{
+    a.isLocked = 1;
+    printf("Account Locked!\n");
+}
+else
+{
+    printf("Attempts Left: %d\n", 3 - a.failedAttempts);
+}
+
+    fseek(fp, -sizeof(Account), SEEK_CUR);
+    fwrite(&a, sizeof(Account), 1, fp);
+        fclose(fp);
+        return;
+    }
+}
     fclose(fp);
 
     if(!found)
@@ -65,6 +95,17 @@ void customerLogin()
     }
 
     printf("\nWelcome %s\n", a.name);
+
+    printf("\n====================================\n");
+printf("        CUSTOMER DASHBOARD\n");
+printf("====================================\n");
+
+printf("Name           : %s\n", a.name);
+printf("Account Number : %d\n", a.accountNumber);
+printf("Account Type   : %s\n", a.accountType);
+printf("Balance        : %.2f\n", a.balance);
+
+printf("====================================\n");
 
     int choice;
 
@@ -100,13 +141,19 @@ else
     sprintf(accStr, "Account: %d", a.accountNumber);
 
     printf("\n===== YOUR TRANSACTIONS =====\n");
+    int count = 0;
 
     while(fgets(line, sizeof(line), fp))
     {
         if(strstr(line, accStr))
-        {
-            printf("%s", line);
-        }
+{
+    printf("%s", line);
+
+    count++;
+
+    if(count >= 5)
+        break;
+}
     }
 
     fclose(fp);
@@ -157,6 +204,11 @@ fclose(fp);
     printf("PIN            : ****\n");
 
     printf("============================\n");
+}
+else if(choice == 5)
+{
+    printf("Logged Out Successfully!\n");
+    break;
 }
         else
         {
@@ -225,7 +277,13 @@ else
         printf("20. Apply for Loan\n");
         printf("21. View Loan Requests\n");
         printf("22. Approve Loan\n");
-        printf("23. Exit\n");
+        printf("23. Reject Loan\n");
+        printf("24. Unlock Account\n");
+        printf("25. Create Fixed Deposit\n");
+        printf("26. View All Fixed Deposits\n");
+        printf("27. Search Transactions by Account\n");
+        printf("28. Edit Account Information\n");
+        printf("29. Exit\n");
 
         printf("Enter Choice: ");
         scanf("%d", &choice);
@@ -318,7 +376,31 @@ else
         {
             approveLoan();
         }
-else if(choice == 23)
+        else if(choice == 23)
+        {
+            rejectLoan();
+        }
+        else if(choice == 24)
+        {
+            unlockAccount();
+        }
+        else if(choice == 25)
+        {
+            createFixedDeposit();
+        }
+        else if(choice == 26)
+        {
+            viewFDs();
+        }
+        else if(choice == 27)
+        {
+            searchTransactionByAccount();
+        }
+        else if(choice == 28)
+        {
+            editAccount();
+        }
+else if(choice == 29)
 {
     printf("\n=================================\n");
     printf("Thank You For Using Bank Management System\n");

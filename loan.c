@@ -49,12 +49,19 @@ void viewLoans()
         printf("Customer Name  : %s\n", l.name);
         printf("Loan Amount    : %.2f\n", l.amount);
 
-        if(l.approved == 0)
-            printf("Status         : Pending\n");
-        else
-            printf("Status         : Approved\n");
-
-        printf("---------------------------------\n");
+     if(l.approved == 0)
+{
+    printf("Status: Pending\n");
+}
+else if(l.approved == 1)
+{
+    printf("Status: Approved\n");
+}
+else if(l.approved == -1)
+{
+    printf("Status: Rejected\n");
+}
+        printf("-----------------------------\n");
     }
 
     fclose(fp);
@@ -130,6 +137,47 @@ void approveLoan()
     }
 
     fclose(lf);
+
+    if(!found)
+    {
+        printf("Pending Loan Not Found!\n");
+    }
+}
+
+void rejectLoan()
+{
+    FILE *fp = fopen("loans.dat", "rb+");
+
+    if(fp == NULL)
+    {
+        printf("No Loan Requests Found!\n");
+        return;
+    }
+
+    int accNo;
+    Loan l;
+    int found = 0;
+
+    printf("Enter Account Number to Reject Loan: ");
+    scanf("%d", &accNo);
+
+    while(fread(&l, sizeof(Loan), 1, fp))
+    {
+        if(l.accountNumber == accNo && l.approved == 0)
+        {
+            found = 1;
+
+            l.approved = -1;
+
+            fseek(fp, -sizeof(Loan), SEEK_CUR);
+            fwrite(&l, sizeof(Loan), 1, fp);
+
+            printf("\nLoan Rejected Successfully!\n");
+            break;
+        }
+    }
+
+    fclose(fp);
 
     if(!found)
     {

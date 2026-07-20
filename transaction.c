@@ -8,7 +8,7 @@ int transactionCounter = 1;
 
 void saveTransaction(char message[])
 {
-    printf("\n SAVE FUNCTION WORKING\n");
+    
 
     FILE *fp = fopen("transactions.txt", "a");
 
@@ -152,4 +152,43 @@ sprintf(log,
 saveTransaction(log);
     printf("\nTransfer Successful!\n");
     printf("%.2f transferred successfully.\n", amount);
+}
+
+void searchTransactionByAccount()
+{
+    FILE *fp = fopen("transactions.txt", "r");
+
+    if(fp == NULL)
+    {
+        printf("No Transaction History Found!\n");
+        return;
+    }
+
+    int accNo;
+    char line[500];
+    char accStr[50];
+    int found = 0;
+
+    printf("Enter Account Number: ");
+    scanf("%d", &accNo);
+
+    sprintf(accStr, "Account: %d", accNo);
+
+    printf("\n===== TRANSACTIONS =====\n");
+
+    while(fgets(line, sizeof(line), fp))
+    {
+        if(strstr(line, accStr))
+        {
+            printf("%s", line);
+            found = 1;
+        }
+    }
+
+    if(!found)
+    {
+        printf("No Transactions Found!\n");
+    }
+
+    fclose(fp);
 }

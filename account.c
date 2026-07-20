@@ -61,8 +61,19 @@ scanf("%s", a.accountType);
     printf("PIN (4 digits): ");
     scanf("%d", &a.pin);
 
+    if(a.pin < 1000 || a.pin > 9999)
+{
+    printf("PIN Must Be 4 Digits!\n");
+    fclose(fp);
+    return;
+}
+
     printf("Initial Balance: ");
     scanf("%f", &a.balance);
+
+    a.failedAttempts = 0;
+a.isLocked = 0;
+a.isActive = 1;
 
     printf("Account Type : %s\n", a.accountType);
 
@@ -96,6 +107,8 @@ void viewAccounts()
         printf("Name           : %s\n", a.name);  
         printf("Account Type   : %s\n", a.accountType);    
         printf("Balance        : %.2f\n", a.balance);
+        printf("Status         : %s\n",
+       a.isLocked ? "LOCKED" : "ACTIVE");
         printf("-------------------------------\n");
     }
 
@@ -609,6 +622,119 @@ if(tf != NULL)
 
             printf("====================================\n");
 
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        printf("Account Not Found!\n");
+    }
+
+    fclose(fp);
+}
+
+void unlockAccount()
+{
+    FILE *fp = fopen("accounts.dat", "rb+");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    int accNo;
+    Account a;
+    int found = 0;
+
+    printf("Enter Account Number: ");
+    scanf("%d", &accNo);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(a.accountNumber == accNo)
+        {
+            found = 1;
+
+            a.isLocked = 0;
+            a.failedAttempts = 0;
+
+            fseek(fp, -sizeof(Account), SEEK_CUR);
+            fwrite(&a, sizeof(Account), 1, fp);
+
+            printf("\nAccount Unlocked Successfully!\n");
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if(!found)
+    {
+        printf("Account Not Found!\n");
+    }
+}
+
+void editAccount()
+{
+    FILE *fp = fopen("accounts.dat", "rb+");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    int accNo;
+    Account a;
+    int found = 0;
+
+    printf("Enter Account Number: ");
+    scanf("%d", &accNo);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(a.accountNumber == accNo)
+        {
+            found = 1;
+
+            int choice;
+
+            printf("\n===== EDIT ACCOUNT =====\n");
+            printf("1. Change Name\n");
+            printf("2. Change Account Type\n");
+            printf("3. Reset PIN\n");
+
+            printf("Enter Choice: ");
+            scanf("%d", &choice);
+
+            if(choice == 1)
+            {
+                printf("Enter New Name: ");
+                scanf(" %[^\n]", a.name);
+            }
+            else if(choice == 2)
+            {
+                printf("Enter New Account Type: ");
+                scanf("%s", a.accountType);
+            }
+            else if(choice == 3)
+            {
+                printf("Enter New PIN: ");
+                scanf("%d", &a.pin);
+            }
+            else
+            {
+                printf("Invalid Choice!\n");
+                fclose(fp);
+                return;
+            }
+
+            fseek(fp, -sizeof(Account), SEEK_CUR);
+            fwrite(&a, sizeof(Account), 1, fp);
+
+            printf("Account Updated Successfully!\n");
             break;
         }
     }
