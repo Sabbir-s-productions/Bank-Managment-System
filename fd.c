@@ -11,10 +11,10 @@ int getNextFDID()
         return 1;
     }
 
-    FD fd;
+    FixedDeposit fd;
     int lastID = 0;
 
-    while(fread(&fd, sizeof(FD), 1, fp))
+    while(fread(&fd, sizeof(FixedDeposit), 1, fp))
     {
         lastID = fd.fdID;
     }
@@ -27,7 +27,7 @@ int getNextFDID()
 
 void createFixedDeposit()
 {
-    FD fd;
+    FixedDeposit fd;
     
     float amount;
     float rate;
@@ -63,7 +63,7 @@ if(fp != NULL)
 {
     fd.fdID = getNextFDID();
 
-    fwrite(&fd, sizeof(FD), 1, fp);
+    fwrite(&fd, sizeof(FixedDeposit), 1, fp);
 
     fclose(fp);
 
@@ -71,7 +71,7 @@ if(fp != NULL)
 }
 }
 
-void viewFDs()
+void viewFixedDeposits()
 {
     FILE *fp = fopen("fd.dat", "rb");
 
@@ -81,11 +81,11 @@ void viewFDs()
         return;
     }
 
-    FD fd;
+    FixedDeposit fd;
 
     printf("\n========== FIXED DEPOSITS ==========\n");
 
-    while(fread(&fd, sizeof(FD), 1, fp))
+    while(fread(&fd, sizeof(FixedDeposit), 1, fp))
     {
         printf("\nFD ID           : %d\n", fd.fdID);
         printf("Amount          : %.2f\n", fd.amount);

@@ -6,6 +6,8 @@ void login();
 void changeAdminPassword();
 
 void dashboard();
+
+// report.h
 void bankStatistics();
 void top5Customers();
 

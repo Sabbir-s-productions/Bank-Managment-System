@@ -8,9 +8,9 @@ typedef struct
     float rate;
     int years;
     float maturity;
-} FD;
+} FixedDeposit;
 
 void createFixedDeposit();
-void viewFDs();
+void viewFixedDeposits();
 
 #endif

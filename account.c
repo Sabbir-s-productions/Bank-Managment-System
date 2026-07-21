@@ -746,3 +746,73 @@ void editAccount()
 
     fclose(fp);
 }
+
+void applyInterest()
+{
+    FILE *fp = fopen("accounts.dat", "rb+");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account a;
+    float rate;
+
+    printf("Enter Interest Rate (%%): ");
+    scanf("%f", &rate);
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        if(strcmp(a.accountType, "Savings") == 0)
+        {
+            float interest =
+                (a.balance * rate) / 100;
+
+            a.balance += interest;
+
+            fseek(fp, -sizeof(Account), SEEK_CUR);
+            fwrite(&a, sizeof(Account), 1, fp);
+
+            fseek(fp, 0, SEEK_CUR);
+        }
+    }
+
+    fclose(fp);
+
+    printf("Interest Applied Successfully!\n");
+}
+
+void monthlyRevenueReport()
+{
+    FILE *fp = fopen("accounts.dat", "rb");
+
+    if(fp == NULL)
+    {
+        printf("No Account Data Found!\n");
+        return;
+    }
+
+    Account a;
+
+    int totalAccounts = 0;
+    float totalDeposits = 0;
+
+    while(fread(&a, sizeof(Account), 1, fp))
+    {
+        totalAccounts++;
+        totalDeposits += a.balance;
+    }
+
+    fclose(fp);
+
+    printf("\n===== MONTHLY BANK REPORT =====\n");
+    printf("Total Accounts : %d\n", totalAccounts);
+    printf("Total Deposits : %.2f\n", totalDeposits);
+
+    printf("Estimated Monthly Revenue : %.2f\n",
+           totalDeposits * 0.01);
+
+    printf("===============================\n");
+}

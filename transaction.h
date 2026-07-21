@@ -4,5 +4,6 @@
 void saveTransaction(char message[]);
 void viewTransactions();
 void transferMoney();
+void searchTransactionByAccount();
 
 #endif

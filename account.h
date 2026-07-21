@@ -29,5 +29,7 @@ void accountReport();
 void generateStatement();
 void unlockAccount();
 void editAccount();
+void applyInterest();
+void monthlyRevenueReport();
 
 #endif
